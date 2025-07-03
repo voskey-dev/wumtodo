@@ -133,7 +133,7 @@ export async function handleTaskClose(
     return {
       type: InteractionResponseType.ChannelMessageWithSource,
       data: { 
-        content: `✅ タスク「**${task.title}**」を完了しました！${assigneeText}\nお疲れ様でした！ 🎉`
+        content: `✅ タスク「**${task.title}**」を完了しました！${assigneeText}\nお疲れ様でした！ 🎉\n\n🔗 **詳細を確認**: ${env.PUBLIC_SITE_URL || 'https://wumtodo.pages.dev'}/tasks/${taskId}`
       },
     };
   } catch (error) {

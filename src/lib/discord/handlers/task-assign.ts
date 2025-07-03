@@ -160,7 +160,7 @@ export async function handleTaskAssign(
     return {
       type: InteractionResponseType.ChannelMessageWithSource,
       data: { 
-        content: `👤 タスク「**${task.title}**」の担当者を <@${userId}> に変更しました。`
+        content: `👤 タスク「**${task.title}**」の担当者を <@${userId}> に変更しました。\n\n🔗 **詳細を確認**: ${env.PUBLIC_SITE_URL || 'https://wumtodo.pages.dev'}/tasks/${taskId}`
       },
     };
   } catch (error) {

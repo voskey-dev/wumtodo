@@ -178,7 +178,7 @@ export async function handleTaskComment(
     return {
       type: InteractionResponseType.ChannelMessageWithSource,
       data: { 
-        content: `💬 コメントを追加しました。`
+        content: `💬 コメントを追加しました。\n\n🔗 **詳細を確認**: ${env.PUBLIC_SITE_URL || 'https://wumtodo.pages.dev'}/tasks/${taskId}`
       },
     };
   } catch (error) {

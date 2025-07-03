@@ -193,7 +193,9 @@ export async function handleTaskCreate(
 **ID**: ${taskId}
 ${description ? `**説明**: ${description}` : ''}
 ${assigneeId ? `**担当者**: <@${assigneeId}>` : ''}
-**優先度**: ${priority === 'high' ? '高' : priority === 'low' ? '低' : '中'}`;
+**優先度**: ${priority === 'high' ? '高' : priority === 'low' ? '低' : '中'}
+
+🔗 **詳細を確認**: ${env.PUBLIC_SITE_URL || 'https://wumtodo.pages.dev'}/tasks/${taskId}`;
 
     return {
       type: InteractionResponseType.ChannelMessageWithSource,
