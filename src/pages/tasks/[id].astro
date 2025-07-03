@@ -1,0 +1,127 @@
+---
+import Layout from '@/layouts/Layout.astro';
+import TaskDetail from '@/components/tasks/TaskDetail.svelte';
+import { Kysely } from 'kysely';
+import { D1Dialect } from 'kysely-d1';
+import type { Database } from '@/types/database';
+
+// 認証チェック
+const user = Astro.locals.user;
+if (!user) {
+  return Astro.redirect('/');
+}
+
+const { id } = Astro.params;
+
+const db = new Kysely<Database>({
+  dialect: new D1Dialect({ database: Astro.locals.runtime.env.DB }),
+});
+
+// タスクを取得
+const task = await db
+  .selectFrom('tasks')
+  .leftJoin('user as assignee', 'assignee.id', 'tasks.assignee_id')
+  .leftJoin('user as creator', 'creator.id', 'tasks.creator_id')
+  .innerJoin('teams', 'teams.id', 'tasks.team_id')
+  .select([
+    'tasks.id',
+    'tasks.title',
+    'tasks.description',
+    'tasks.status',
+    'tasks.priority',
+    'tasks.due_date',
+    'tasks.created_at',
+    'tasks.updated_at',
+    'tasks.discord_thread_id',
+    'tasks.discord_channel_id',
+    'assignee.id as assignee_id',
+    'assignee.username as assignee_username',
+    'assignee.avatar_url as assignee_avatar_url',
+    'creator.id as creator_id',
+    'creator.username as creator_username',
+    'creator.avatar_url as creator_avatar_url',
+    'teams.id as team_id',
+    'teams.name as team_name',
+    'teams.discord_server_id',
+  ])
+  .where('tasks.id', '=', id!)
+  .executeTakeFirst();
+
+if (!task) {
+  return Astro.redirect('/tasks');
+}
+
+// ユーザーがチームメンバーかチェック
+const isMember = await db
+  .selectFrom('team_members')
+  .select(['user_id'])
+  .where('team_id', '=', task.team_id)
+  .where('user_id', '=', user.id)
+  .executeTakeFirst();
+
+if (!isMember) {
+  return Astro.redirect('/tasks');
+}
+
+// コメントを取得
+const comments = await db
+  .selectFrom('task_comments')
+  .innerJoin('user', 'user.id', 'task_comments.user_id')
+  .select([
+    'task_comments.id',
+    'task_comments.content',
+    'task_comments.created_at',
+    'user.id as user_id',
+    'user.username',
+    'user.avatar_url',
+  ])
+  .where('task_comments.task_id', '=', id!)
+  .orderBy('task_comments.created_at', 'asc')
+  .execute();
+
+const taskData: Parameters<typeof TaskDetail>[0]['task'] = {
+  id: task.id,
+  title: task.title,
+  description: task.description,
+  status: task.status as 'todo' | 'in_progress' | 'completed',
+  priority: task.priority as 'high' | 'medium' | 'low',
+  dueDate: task.due_date,
+  createdAt: task.created_at,
+  updatedAt: task.updated_at,
+  discordThreadId: task.discord_thread_id,
+  discordChannelId: task.discord_channel_id,
+  assignee: task.assignee_id ? {
+    id: task.assignee_id,
+    username: task.assignee_username!,
+    avatar_url: task.assignee_avatar_url,
+  } : null,
+  creator: {
+    id: task.creator_id!,
+    username: task.creator_username!,
+    avatar_url: task.creator_avatar_url,
+  },
+  team: {
+    id: task.team_id,
+    name: task.team_name,
+    discordServerId: task.discord_server_id,
+  },
+  comments: comments.map(comment => ({
+    id: comment.id,
+    content: comment.content,
+    createdAt: comment.created_at,
+    user: {
+      id: comment.user_id,
+      username: comment.username,
+      avatar_url: comment.avatar_url,
+    },
+  })),
+};
+---
+
+<Layout title={task.title}>
+  <main class="min-h-screen bg-background">
+    <div class="container mx-auto px-4 py-8">
+      <TaskDetail client:load task={taskData} currentUserId={user.id} />
+    </div>
+  </main>
+</Layout>

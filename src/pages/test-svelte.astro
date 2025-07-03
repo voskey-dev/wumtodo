@@ -1,0 +1,115 @@
+---
+import Layout from '@/layouts/Layout.astro';
+import LoginButton from '@/components/auth/LoginButton.svelte';
+import UserMenu from '@/components/auth/UserMenu.svelte';
+import Button from '@/components/ui-svelte/button.svelte';
+import Badge from '@/components/ui-svelte/badge.svelte';
+import Card from '@/components/ui-svelte/card.svelte';
+import CardHeader from '@/components/ui-svelte/card-header.svelte';
+import CardTitle from '@/components/ui-svelte/card-title.svelte';
+import CardContent from '@/components/ui-svelte/card-content.svelte';
+import Input from '@/components/ui-svelte/input.svelte';
+import Label from '@/components/ui-svelte/label.svelte';
+import Textarea from '@/components/ui-svelte/textarea.svelte';
+import Select from '@/components/ui-svelte/select.svelte';
+import SelectTrigger from '@/components/ui-svelte/select-trigger.svelte';
+import SelectContent from '@/components/ui-svelte/select-content.svelte';
+import SelectItem from '@/components/ui-svelte/select-item.svelte';
+import Switch from '@/components/ui-svelte/switch.svelte';
+---
+
+<Layout title="Svelte Components Test">
+  <main class="container mx-auto p-8">
+    <h1 class="text-3xl font-bold mb-8">Svelte コンポーネントテスト</h1>
+    
+    <div class="space-y-8">
+      <!-- Login Button Test -->
+      <Card>
+        <CardHeader>
+          <CardTitle>ログインボタン</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <LoginButton client:load />
+        </CardContent>
+      </Card>
+
+      <!-- Button Variants -->
+      <Card>
+        <CardHeader>
+          <CardTitle>ボタンバリエーション</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div class="flex flex-wrap gap-4">
+            <Button client:load>Default</Button>
+            <Button client:load variant="secondary">Secondary</Button>
+            <Button client:load variant="destructive">Destructive</Button>
+            <Button client:load variant="outline">Outline</Button>
+            <Button client:load variant="ghost">Ghost</Button>
+            <Button client:load variant="link">Link</Button>
+          </div>
+        </CardContent>
+      </Card>
+
+      <!-- Badge Variants -->
+      <Card>
+        <CardHeader>
+          <CardTitle>バッジバリエーション</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div class="flex flex-wrap gap-4">
+            <Badge>Default</Badge>
+            <Badge variant="secondary">Secondary</Badge>
+            <Badge variant="destructive">Destructive</Badge>
+            <Badge variant="outline">Outline</Badge>
+          </div>
+        </CardContent>
+      </Card>
+
+      <!-- Form Elements -->
+      <Card>
+        <CardHeader>
+          <CardTitle>フォーム要素</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div class="space-y-4">
+            <div>
+              <Label for="test-input">入力フィールド</Label>
+              <Input client:load id="test-input" placeholder="テキストを入力..." />
+            </div>
+            <div>
+              <Label for="test-textarea">テキストエリア</Label>
+              <Textarea client:load id="test-textarea" placeholder="詳細を入力..." />
+            </div>
+            <div>
+              <Label for="test-select">セレクトボックス</Label>
+              <Select client:load>
+                <SelectTrigger id="test-select" placeholder="オプションを選択" />
+                <SelectContent>
+                  <SelectItem value="option1">オプション 1</SelectItem>
+                  <SelectItem value="option2">オプション 2</SelectItem>
+                  <SelectItem value="option3">オプション 3</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            <div class="flex items-center space-x-2">
+              <Switch client:load id="test-switch" />
+              <Label for="test-switch">通知を有効にする</Label>
+            </div>
+          </div>
+        </CardContent>
+      </Card>
+
+      <!-- User Menu Test -->
+      <Card>
+        <CardHeader>
+          <CardTitle>ユーザーメニュー</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div class="flex justify-end">
+            <UserMenu client:load />
+          </div>
+        </CardContent>
+      </Card>
+    </div>
+  </main>
+</Layout>

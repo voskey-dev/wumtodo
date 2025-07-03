@@ -1,0 +1,37 @@
+---
+import Layout from '@/layouts/Layout.astro';
+
+// 認証チェック（仮実装）
+// TODO: 認証ミドルウェア実装後に更新
+---
+
+<Layout title="ダッシュボード">
+  <main class="min-h-screen bg-background">
+    <div class="container mx-auto px-4 py-8">
+      <h1 class="text-3xl font-bold mb-8">ダッシュボード</h1>
+      
+      <div class="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+        <a href="/tasks" class="rounded-lg border bg-card p-6 hover:shadow-md transition-shadow">
+          <h2 class="text-xl font-semibold mb-2">タスク管理</h2>
+          <p class="text-muted-foreground">
+            タスクの一覧表示、作成、編集を行います
+          </p>
+        </a>
+        
+        <a href="/teams" class="rounded-lg border bg-card p-6 hover:shadow-md transition-shadow">
+          <h2 class="text-xl font-semibold mb-2">チーム管理</h2>
+          <p class="text-muted-foreground">
+            チームメンバーの管理と招待を行います
+          </p>
+        </a>
+        
+        <div class="rounded-lg border bg-card p-6">
+          <h2 class="text-xl font-semibold mb-2">Discord連携</h2>
+          <p class="text-muted-foreground">
+            タスクの作成はDiscordのスラッシュコマンドから行ってください
+          </p>
+        </div>
+      </div>
+    </div>
+  </main>
+</Layout>

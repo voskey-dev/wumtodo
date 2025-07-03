@@ -1,0 +1,37 @@
+name = "wumtodo"
+compatibility_date = "2024-01-01"
+
+# D1 Database bindings
+[[d1_databases]]
+binding = "DB"
+database_name = "wumtodo"
+database_id = "YOUR_DATABASE_ID"
+
+# Environment variables
+[vars]
+DISCORD_PUBLIC_KEY = "YOUR_DISCORD_PUBLIC_KEY"
+DISCORD_APPLICATION_ID = "YOUR_DISCORD_APPLICATION_ID"
+DISCORD_BOT_TOKEN = "YOUR_DISCORD_BOT_TOKEN"
+BETTER_AUTH_SECRET = "YOUR_BETTER_AUTH_SECRET"
+BETTER_AUTH_URL = "YOUR_APP_URL"
+
+# Cron Triggers for reminders
+[triggers]
+crons = ["0 9 * * *"]  # 毎日午前9時（UTC）に実行
+
+# Additional worker for cron jobs
+[[workers]]
+name = "wumtodo-cron"
+main = "src/workers/cron-reminder.ts"
+
+[[workers.d1_databases]]
+binding = "DB"
+database_name = "wumtodo"
+database_id = "YOUR_DATABASE_ID"
+
+[workers.vars]
+DISCORD_BOT_TOKEN = "YOUR_DISCORD_BOT_TOKEN"
+
+
+[assets]
+directory = "./dist"

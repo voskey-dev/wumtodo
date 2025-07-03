@@ -1,0 +1,101 @@
+---
+import Layout from '@/layouts/Layout.astro';
+import TeamDetail from '@/components/teams/TeamDetail.svelte';
+import { Kysely } from 'kysely';
+import { D1Dialect } from 'kysely-d1';
+import type { Database } from '@/types/database';
+
+// 認証チェック
+const user = Astro.locals.user;
+if (!user) {
+  return Astro.redirect('/');
+}
+
+const { id } = Astro.params;
+
+const db = new Kysely<Database>({
+  dialect: new D1Dialect({ database: Astro.locals.runtime.env.DB }),
+});
+
+// チーム情報を取得
+const team = await db
+  .selectFrom('teams')
+  .select(['id', 'name', 'discord_server_id', 'created_at'])
+  .where('id', '=', id!)
+  .executeTakeFirst();
+
+if (!team) {
+  return Astro.redirect('/teams');
+}
+
+// ユーザーのロールを確認
+const userMember = await db
+  .selectFrom('team_members')
+  .select(['role'])
+  .where('team_id', '=', id!)
+  .where('user_id', '=', user.id)
+  .executeTakeFirst();
+
+if (!userMember) {
+  return Astro.redirect('/teams');
+}
+
+// チームメンバーを取得
+const members = await db
+  .selectFrom('team_members')
+  .innerJoin('user', 'user.id', 'team_members.user_id')
+  .select([
+    'user.id',
+    'user.username',
+    'user.avatar_url',
+    'user.discord_id',
+    'team_members.role',
+  ])
+  .where('team_members.team_id', '=', id!)
+  .orderBy('team_members.role', 'desc')
+  .orderBy('user.username', 'asc')
+  .execute();
+
+// タスク統計を取得
+const taskStats = await db
+  .selectFrom('tasks')
+  .select(['status'])
+  .select(db.fn.count<number>('id').as('count'))
+  .where('team_id', '=', id!)
+  .groupBy('status')
+  .execute();
+
+const stats = {
+  todo: 0,
+  in_progress: 0,
+  completed: 0,
+  total: 0,
+};
+
+taskStats.forEach(stat => {
+  const count = stat.count || 0;
+  stats[stat.status as keyof typeof stats] = count;
+  stats.total += count;
+});
+
+const teamData = {
+  ...team,
+  members,
+  stats,
+  currentUserRole: userMember.role,
+};
+---
+
+<Layout title={`${team.name} - チーム管理`}>
+  <main class="min-h-screen bg-background">
+    <div class="container mx-auto px-4 py-8">
+      <div class="mb-6">
+        <a href="/teams" class="text-muted-foreground hover:text-foreground">
+          ← チーム一覧に戻る
+        </a>
+      </div>
+      
+      <TeamDetail client:load team={teamData} currentUserId={user.id} />
+    </div>
+  </main>
+</Layout>

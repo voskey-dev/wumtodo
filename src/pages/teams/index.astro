@@ -1,0 +1,64 @@
+---
+import Layout from '@/layouts/Layout.astro';
+import TeamList from '@/components/teams/TeamList.svelte';
+import { Kysely } from 'kysely';
+import { D1Dialect } from 'kysely-d1';
+import type { Database } from '@/types/database';
+
+// 認証チェック
+const user = Astro.locals.user;
+if (!user) {
+  return Astro.redirect('/');
+}
+
+const db = new Kysely<Database>({
+  dialect: new D1Dialect({ database: Astro.locals.runtime.env.DB }),
+});
+
+// ユーザーが所属するチームを取得
+const teams = await db
+  .selectFrom('team_members')
+  .innerJoin('teams', 'teams.id', 'team_members.team_id')
+  .select([
+    'teams.id',
+    'teams.name',
+    'teams.discord_server_id',
+    'teams.created_at',
+    'team_members.role',
+  ])
+  .where('team_members.user_id', '=', user.id)
+  .execute();
+
+// 各チームのメンバー数を取得
+const memberCounts = await db
+  .selectFrom('team_members')
+  .select(['team_id'])
+  .select(db.fn.count<number>('user_id').as('member_count'))
+  .groupBy('team_id')
+  .where('team_id', 'in', teams.map(t => t.id))
+  .execute();
+
+const memberCountMap = Object.fromEntries(
+  memberCounts.map(mc => [mc.team_id, mc.member_count || 0])
+);
+
+const teamsWithCounts = teams.map(team => ({
+  ...team,
+  memberCount: memberCountMap[team.id] || 0,
+}));
+---
+
+<Layout title="チーム管理">
+  <main class="min-h-screen bg-background">
+    <div class="container mx-auto px-4 py-8">
+      <div class="mb-8">
+        <h1 class="text-3xl font-bold">チーム管理</h1>
+        <p class="text-muted-foreground mt-2">
+          所属しているチームの一覧と管理
+        </p>
+      </div>
+      
+      <TeamList client:load teams={teamsWithCounts} currentUserId={user.id} />
+    </div>
+  </main>
+</Layout>

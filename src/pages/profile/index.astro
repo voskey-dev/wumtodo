@@ -1,0 +1,102 @@
+---
+import Layout from '@/layouts/Layout.astro';
+import UserProfile from '@/components/profile/UserProfile.svelte';
+import { Kysely } from 'kysely';
+import { D1Dialect } from 'kysely-d1';
+import type { Database } from '@/types/database';
+
+// 認証チェック
+const user = Astro.locals.user;
+
+if (!user) {
+  return Astro.redirect('/');
+}
+
+const db = new Kysely<Database>({
+  dialect: new D1Dialect({ database: Astro.locals.runtime.env.DB }),
+});
+
+// ユーザーの詳細情報を取得
+const userDetail = await db
+  .selectFrom('user')
+  .select([
+    'id',
+    'username',
+    'discord_id',
+    'avatar_url',
+    'createdAt',
+    'updatedAt',
+  ])
+  .where('id', '=', user.id)
+  .executeTakeFirst();
+
+if (!userDetail) {
+  return Astro.redirect('/');
+}
+
+// ユーザーが所属するチームを取得
+const teams = await db
+  .selectFrom('team_members')
+  .innerJoin('teams', 'teams.id', 'team_members.team_id')
+  .select([
+    'teams.id',
+    'teams.name',
+    'team_members.role',
+  ])
+  .where('team_members.user_id', '=', user.id)
+  .execute();
+
+// タスク統計を取得
+const taskStats = await db
+  .selectFrom('tasks')
+  .select(['status'])
+  .select(db.fn.count<number>('id').as('count'))
+  .where('assignee_id', '=', user.id)
+  .groupBy('status')
+  .execute();
+
+const stats = {
+  todo: 0,
+  in_progress: 0,
+  completed: 0,
+  total: 0,
+};
+
+taskStats.forEach(stat => {
+  const count = stat.count || 0;
+  stats[stat.status as keyof typeof stats] = count;
+  stats.total += count;
+});
+
+// 最近のアクティビティ（最近更新されたタスク）を取得
+const recentTasks = await db
+  .selectFrom('tasks')
+  .innerJoin('teams', 'teams.id', 'tasks.team_id')
+  .select([
+    'tasks.id',
+    'tasks.title',
+    'tasks.status',
+    'tasks.priority',
+    'tasks.updated_at',
+    'teams.name as team_name',
+  ])
+  .where('tasks.assignee_id', '=', user.id)
+  .orderBy('tasks.updated_at', 'desc')
+  .limit(5)
+  .execute();
+
+const profileData = {
+  user: userDetail,
+  teams,
+  stats,
+  recentTasks,
+};
+---
+
+<Layout title="プロファイル">
+  <main class="min-h-screen bg-background">
+    <div class="container mx-auto px-4 py-8">
+      <UserProfile client:load profile={profileData} />
+    </div>
+  </main>
+</Layout>

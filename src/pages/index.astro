@@ -1,0 +1,37 @@
+---
+import Layout from '@/layouts/Layout.astro';
+---
+
+<Layout title="ホーム">
+  <main class="min-h-screen bg-background">
+    <div class="container mx-auto px-4 py-8">
+      <h1 class="text-4xl font-bold text-foreground mb-4">wumtodo</h1>
+      <p class="text-lg text-muted-foreground mb-8">
+        Discordと連携するチーム向けタスク管理ツール
+      </p>
+      
+      <div class="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+        <div class="rounded-lg border bg-card p-6 shadow-sm">
+          <h2 class="text-xl font-semibold mb-2">Discord連携</h2>
+          <p class="text-muted-foreground">
+            スラッシュコマンドでタスクを管理し、自動でスレッドを作成
+          </p>
+        </div>
+        
+        <div class="rounded-lg border bg-card p-6 shadow-sm">
+          <h2 class="text-xl font-semibold mb-2">チーム管理</h2>
+          <p class="text-muted-foreground">
+            チームメンバーへのタスク割り当てと進捗の可視化
+          </p>
+        </div>
+        
+        <div class="rounded-lg border bg-card p-6 shadow-sm">
+          <h2 class="text-xl font-semibold mb-2">リマインダー</h2>
+          <p class="text-muted-foreground">
+            期限が近づいたタスクを自動でDiscordに通知
+          </p>
+        </div>
+      </div>
+    </div>
+  </main>
+</Layout>
