@@ -133,7 +133,8 @@ export async function handleTaskComment(
         mentionedUsers,
         task.title,
         taskId,
-        `コメント: "${content.substring(0, 50)}${content.length > 50 ? '...' : ''}"`
+        `コメント: "${content.substring(0, 50)}${content.length > 50 ? '...' : ''}"`,
+        env.PUBLIC_SITE_URL
       );
       
       // 各ユーザーにDMで通知
@@ -166,7 +167,7 @@ export async function handleTaskComment(
           `**内容**:`,
           content.substring(0, 200) + (content.length > 200 ? '...' : ''),
           ``,
-          `🔗 タスクID: ${taskId}`
+          `🔗 **詳細を確認**: ${env.PUBLIC_SITE_URL || 'https://wumtodo.pages.dev'}/tasks/${taskId}`
         ].join('\n');
         
         await discordAPI.sendDirectMessage(stakeholderId, dmMessage);

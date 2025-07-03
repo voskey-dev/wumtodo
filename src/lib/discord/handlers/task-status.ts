@@ -91,7 +91,7 @@ export async function handleTaskStatus(
       `🔄 **変更**: ${oldStatusText} → **${statusText}**`,
       task.assignee_discord_id ? `👥 **担当者**: <@${task.assignee_discord_id}>` : '',
       ``,
-      `🔗 タスクID: ${taskId}`
+      `🔗 **詳細を確認**: ${env.PUBLIC_SITE_URL || 'https://wumtodo.pages.dev'}/tasks/${taskId}`
     ].filter(Boolean).join('\n');
 
     // Discord APIクライアントを初期化

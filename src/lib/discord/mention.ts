@@ -64,7 +64,8 @@ export function formatMentionNotification(
   mentions: MentionInfo[],
   taskTitle: string,
   taskId: string,
-  mentionContext: string
+  mentionContext: string,
+  siteUrl?: string
 ): string {
   const userMentions = mentions.filter(m => m.type === 'user');
   
@@ -84,6 +85,6 @@ export function formatMentionNotification(
     `📌 **タスク**: ${taskTitle}`,
     `💬 **コンテキスト**: ${mentionContext}`,
     ``,
-    `🔗 タスクID: ${taskId}`
+    `🔗 **詳細を確認**: ${siteUrl || 'https://wumtodo.pages.dev'}/tasks/${taskId}`
   ].join('\n');
 }

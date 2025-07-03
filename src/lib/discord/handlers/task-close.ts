@@ -105,9 +105,9 @@ export async function handleTaskClose(
       task.assignee_discord_id ? `👥 **担当者**: <@${task.assignee_discord_id}>` : '',
       `⏱️ **所要時間**: ${durationText}`,
       ``,
-      `🔗 タスクID: ${taskId}`,
+      `お疲れ様でした！ 🎆`,
       ``,
-      `お疲れ様でした！ 🎆`
+      `🔗 **詳細を確認**: ${env.PUBLIC_SITE_URL || 'https://wumtodo.pages.dev'}/tasks/${taskId}`
     ].filter(Boolean).join('\n');
 
     // Discord APIクライアントを初期化
