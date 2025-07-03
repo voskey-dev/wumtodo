@@ -38,19 +38,6 @@ export async function handleWumtodoSetup(
       // Error fetching guild info, but continue with default name
     }
 
-    // 実行者の権限を確認（管理者権限が必要）
-    const memberPermissions = interaction.member.permissions;
-    const isAdmin = memberPermissions && (BigInt(memberPermissions) & BigInt(0x8)) !== BigInt(0); // ADMINISTRATOR permission
-
-    if (!isAdmin) {
-      return {
-        type: InteractionResponseType.ChannelMessageWithSource,
-        data: {
-          content: '❌ このコマンドはサーバー管理者のみ実行できます。',
-          flags: 64 // Ephemeral
-        },
-      };
-    }
 
     // チームが既に存在するか確認
     const existingTeam = await db
@@ -81,7 +68,7 @@ export async function handleWumtodoSetup(
       } as any)
       .execute();
 
-    // 実行者を管理者として登録
+    // 実行者をチームメンバーとして登録
     const userId = interaction.member.user.id;
     const username = interaction.member.user.username;
     const avatar = interaction.member.user.avatar;
@@ -114,13 +101,13 @@ export async function handleWumtodoSetup(
         .executeTakeFirst();
 
       if (user) {
-        // チームメンバーとして管理者権限で追加
+        // チームメンバーとして追加
         await db
           .insertInto('team_members')
           .values({
             team_id: teamId,
             user_id: user.id,
-            role: 'admin',
+            role: 'member',
           } as any)
           .onConflict((oc) => oc.columns(['team_id', 'user_id']).doNothing())
           .execute();
@@ -131,7 +118,7 @@ export async function handleWumtodoSetup(
       `🎉 **wumtodoのセットアップが完了しました！**`,
       ``,
       `チーム名: **${guildName}**`,
-      `管理者: <@${userId}>`,
+      `登録者: <@${userId}>`,
       ``,
       `**📝 使用可能なコマンド:**`,
       `• \`/task create\` - 新しいタスクを作成`,
