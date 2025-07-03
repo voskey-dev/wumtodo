@@ -12,7 +12,9 @@
     "format": "prettier --write .",
     "format:check": "prettier --check .",
     "typecheck": "astro check && tsc --noEmit",
-    "discord:register": "tsx scripts/register-commands.ts"
+    "discord:register": "tsx scripts/register-commands.ts",
+    "deploy:cron": "wrangler deploy --config wrangler.cron.toml",
+    "dev:cron": "wrangler dev --config wrangler.cron.toml"
   },
   "dependencies": {
     "@astrojs/cloudflare": "^12.6.0",
