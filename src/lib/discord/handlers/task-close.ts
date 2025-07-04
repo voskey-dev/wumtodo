@@ -117,8 +117,11 @@ export async function handleTaskClose(
     if (task.discord_thread_id) {
       try {
         await discordAPI.sendMessage(task.discord_thread_id, notificationMessage);
+        
+        // スレッドをアーカイブ（閉じる）
+        await discordAPI.archiveThread(task.discord_thread_id, true);
       } catch (error) {
-        // Failed to send notification to thread
+        console.error('Failed to send notification or archive thread:', error);
       }
     }
     // スレッドがない場合は、元のチャンネルに通知

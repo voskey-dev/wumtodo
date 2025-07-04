@@ -108,4 +108,14 @@ export class DiscordAPI {
 
     return response.json();
   }
+
+  async archiveThread(threadId: string, archived: boolean = true): Promise<any> {
+    const response = await this.request(
+      'PATCH',
+      `/channels/${threadId}`,
+      { archived }
+    );
+
+    return response.json();
+  }
 }
