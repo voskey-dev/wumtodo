@@ -44,7 +44,8 @@ export async function handleTaskDue(
       };
     }
 
-    const dueDate = new Date(dateStr + 'T00:00:00Z');
+    // JST 23:59 に設定するため、UTCで14:59に設定
+    const dueDate = new Date(dateStr + 'T14:59:00Z');
     if (isNaN(dueDate.getTime())) {
       return {
         type: InteractionResponseType.ChannelMessageWithSource,
@@ -86,10 +87,13 @@ export async function handleTaskDue(
       .where('id', '=', taskId)
       .executeTakeFirst();
 
-    // 期限までの残り日数を計算
-    const today = new Date();
-    today.setHours(0, 0, 0, 0);
-    const timeDiff = dueDate.getTime() - today.getTime();
+    // 期限までの残り日数を計算（JSTベース）
+    const now = new Date();
+    const jstOffset = 9 * 60 * 60 * 1000; // JST = UTC+9
+    const nowJST = new Date(now.getTime() + jstOffset);
+    const todayJST = new Date(nowJST.getFullYear(), nowJST.getMonth(), nowJST.getDate());
+    const dueDateJST = new Date(dueDate.getTime() + jstOffset);
+    const timeDiff = dueDateJST.getTime() - todayJST.getTime();
     const daysUntilDue = Math.ceil(timeDiff / (1000 * 60 * 60 * 24));
     
     let dueText = '';
@@ -109,7 +113,7 @@ export async function handleTaskDue(
       ``,
       `📌 **タスク**: ${task.title}`,
       `👤 **設定者**: <@${interaction.member.user.id}>`,
-      `🔄 **変更**: ${task.old_due_date ? new Date(task.old_due_date).toISOString().split('T')[0] : '未設定'} → **${dateStr}**`,
+      `🔄 **変更**: ${task.old_due_date ? new Date(task.old_due_date).toISOString().split('T')[0] : '未設定'} → **${dateStr}** (JST 23:59)`,
       task.assignee_discord_id ? `👥 **担当者**: <@${task.assignee_discord_id}>` : '',
       ``,
       dueText,
