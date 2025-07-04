@@ -94,4 +94,18 @@ export class DiscordAPI {
     // メッセージを送信
     return this.sendMessage(dmChannel.id, content);
   }
+
+  async sendFollowUpMessage(
+    applicationId: string,
+    interactionToken: string,
+    messageData: any
+  ): Promise<any> {
+    const response = await this.request(
+      'POST',
+      `/webhooks/${applicationId}/${interactionToken}`,
+      messageData
+    );
+
+    return response.json();
+  }
 }

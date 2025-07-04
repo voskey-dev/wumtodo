@@ -33,8 +33,8 @@ importers:
         specifier: ^4.1.0
         version: 4.1.0
       discord-api-types:
-        specifier: ^0.38.14
-        version: 0.38.14
+        specifier: ^0.38.15
+        version: 0.38.15
       kysely:
         specifier: ^0.28.2
         version: 0.28.2
@@ -1700,8 +1700,8 @@ packages:
     resolution: {integrity: sha512-uIFDxqpRZGZ6ThOk84hEfqWoHx2devRFvpTZcTHur85vImfaxUbTW9Ryh4CpCuDnToOP1CEtXKIgytHBPVff5A==}
     engines: {node: '>=0.3.1'}
 
-  discord-api-types@0.38.14:
-    resolution: {integrity: sha512-5qknrPxvIzAiX2tDb7dB55A4ydb/nCKxhlO48RrMNeyEGsBgk/88qIAsUm7K7nDnNkkOgJYt/wufybEPYWRMJQ==}
+  discord-api-types@0.38.15:
+    resolution: {integrity: sha512-RX3skyRH7p6BlHOW62ztdnIc87+wv4TEJEURMir5k5BbRJ10wK1MCqFEO6USHTol3gkiHLE6wWoHhNQ2pqB4AA==}
 
   dlv@1.1.3:
     resolution: {integrity: sha512-+HlytyjlPKnIG8XuRG8WvmBP8xs8P71y+SKKS6ZXWoEgLuePxtDoUEiH7WkdePWrQ5JBpE6aoVqfZfJUQkjXwA==}
@@ -5251,7 +5251,7 @@ snapshots:
 
   diff@5.2.0: {}
 
-  discord-api-types@0.38.14: {}
+  discord-api-types@0.38.15: {}
 
   dlv@1.1.3: {}
 

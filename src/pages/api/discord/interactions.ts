@@ -11,6 +11,20 @@ import { handleTaskDue } from '@/lib/discord/handlers/task-due';
 import { handleTaskClose } from '@/lib/discord/handlers/task-close';
 import { handleTaskComment } from '@/lib/discord/handlers/task-comment';
 import { handleWumtodoSetup } from '@/lib/discord/handlers/wumtodo-setup';
+import { DiscordAPI } from '@/lib/discord/api';
+
+async function sendFollowUpMessage(
+  interaction: any,
+  messageData: any,
+  env: any
+): Promise<void> {
+  const api = new DiscordAPI(env.DISCORD_BOT_TOKEN);
+  await api.sendFollowUpMessage(
+    env.DISCORD_APPLICATION_ID,
+    interaction.token,
+    messageData
+  );
+}
 
 export const POST: APIRoute = async ({ request, locals }) => {
   const signature = request.headers.get('X-Signature-Ed25519') || '';
@@ -54,82 +68,104 @@ export const POST: APIRoute = async ({ request, locals }) => {
     
     if (commandName === 'wumtodo') {
       const subcommand = 'options' in interaction.data ? interaction.data.options?.[0]?.name : undefined;
-      try {
-        let response;
-        
-        switch (subcommand) {
-          case 'setup':
-            response = await handleWumtodoSetup(interaction, locals.runtime.env);
-            break;
-          default:
-            response = {
-              type: InteractionResponseType.ChannelMessageWithSource,
-              data: { content: '不明なサブコマンドです。' },
-            };
+      
+      // 即座にDeferredレスポンスを返す
+      const deferredResponse = {
+        type: 5, // InteractionResponseType.DeferredChannelMessageWithSource
+      };
+      
+      // Deferredレスポンスを送信後、非同期で処理を実行
+      setTimeout(async () => {
+        try {
+          let messageData;
+          
+          switch (subcommand) {
+            case 'setup':
+              const result = await handleWumtodoSetup(interaction, locals.runtime.env);
+              messageData = result.data;
+              break;
+            default:
+              messageData = { content: '不明なサブコマンドです。' };
+          }
+          
+          // フォローアップメッセージを送信
+          await sendFollowUpMessage(interaction, messageData, locals.runtime.env);
+        } catch (error) {
+          console.error('Command handling error:', error);
+          await sendFollowUpMessage(
+            interaction,
+            { content: 'エラーが発生しました。もう一度お試しください。' },
+            locals.runtime.env
+          );
         }
-
-        return new Response(JSON.stringify(response), {
-          headers: { 'Content-Type': 'application/json' },
-        });
-      } catch (error) {
-        console.error('Command handling error:', error);
-        return new Response(
-          JSON.stringify({
-            type: InteractionResponseType.ChannelMessageWithSource,
-            data: { content: 'エラーが発生しました。もう一度お試しください。' },
-          }),
-          { headers: { 'Content-Type': 'application/json' } }
-        );
-      }
+      }, 0);
+      
+      return new Response(JSON.stringify(deferredResponse), {
+        headers: { 'Content-Type': 'application/json' },
+      });
     }
     
     if (commandName === 'task') {
       const subcommand = 'options' in interaction.data ? interaction.data.options?.[0]?.name : undefined;
-      try {
-        let response;
-        
-        switch (subcommand) {
-          case 'create':
-            response = await handleTaskCreate(interaction, locals.runtime.env);
-            break;
-          case 'list':
-            response = await handleTaskList(interaction, locals.runtime.env);
-            break;
-          case 'status':
-            response = await handleTaskStatus(interaction, locals.runtime.env);
-            break;
-          case 'assign':
-            response = await handleTaskAssign(interaction, locals.runtime.env);
-            break;
-          case 'due':
-            response = await handleTaskDue(interaction, locals.runtime.env);
-            break;
-          case 'close':
-            response = await handleTaskClose(interaction, locals.runtime.env);
-            break;
-          case 'comment':
-            response = await handleTaskComment(interaction, locals.runtime.env);
-            break;
-          default:
-            response = {
-              type: InteractionResponseType.ChannelMessageWithSource,
-              data: { content: '不明なサブコマンドです。' },
-            };
+      
+      // 即座にDeferredレスポンスを返す
+      const deferredResponse = {
+        type: 5, // InteractionResponseType.DeferredChannelMessageWithSource
+      };
+      
+      // Deferredレスポンスを送信後、非同期で処理を実行
+      setTimeout(async () => {
+        try {
+          let messageData;
+          
+          switch (subcommand) {
+            case 'create':
+              const createResult = await handleTaskCreate(interaction, locals.runtime.env);
+              messageData = createResult.data;
+              break;
+            case 'list':
+              const listResult = await handleTaskList(interaction, locals.runtime.env);
+              messageData = listResult.data;
+              break;
+            case 'status':
+              const statusResult = await handleTaskStatus(interaction, locals.runtime.env);
+              messageData = statusResult.data;
+              break;
+            case 'assign':
+              const assignResult = await handleTaskAssign(interaction, locals.runtime.env);
+              messageData = assignResult.data;
+              break;
+            case 'due':
+              const dueResult = await handleTaskDue(interaction, locals.runtime.env);
+              messageData = dueResult.data;
+              break;
+            case 'close':
+              const closeResult = await handleTaskClose(interaction, locals.runtime.env);
+              messageData = closeResult.data;
+              break;
+            case 'comment':
+              const commentResult = await handleTaskComment(interaction, locals.runtime.env);
+              messageData = commentResult.data;
+              break;
+            default:
+              messageData = { content: '不明なサブコマンドです。' };
+          }
+          
+          // フォローアップメッセージを送信
+          await sendFollowUpMessage(interaction, messageData, locals.runtime.env);
+        } catch (error) {
+          console.error('Command handling error:', error);
+          await sendFollowUpMessage(
+            interaction,
+            { content: 'エラーが発生しました。もう一度お試しください。' },
+            locals.runtime.env
+          );
         }
-
-        return new Response(JSON.stringify(response), {
-          headers: { 'Content-Type': 'application/json' },
-        });
-      } catch (error) {
-        console.error('Command handling error:', error);
-        return new Response(
-          JSON.stringify({
-            type: InteractionResponseType.ChannelMessageWithSource,
-            data: { content: 'エラーが発生しました。もう一度お試しください。' },
-          }),
-          { headers: { 'Content-Type': 'application/json' } }
-        );
-      }
+      }, 0);
+      
+      return new Response(JSON.stringify(deferredResponse), {
+        headers: { 'Content-Type': 'application/json' },
+      });
     }
   }
   
