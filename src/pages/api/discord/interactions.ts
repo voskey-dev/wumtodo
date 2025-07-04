@@ -74,31 +74,34 @@ export const POST: APIRoute = async ({ request, locals }) => {
         type: 5, // InteractionResponseType.DeferredChannelMessageWithSource
       };
       
-      // Deferredレスポンスを送信後、非同期で処理を実行
-      setTimeout(async () => {
-        try {
-          let messageData;
-          
-          switch (subcommand) {
-            case 'setup':
-              const result = await handleWumtodoSetup(interaction, locals.runtime.env);
-              messageData = result.data;
-              break;
-            default:
-              messageData = { content: '不明なサブコマンドです。' };
+      // Cloudflare WorkersのwaitUntilを使用して非同期処理を実行
+      const ctx = locals.runtime.ctx;
+      ctx.waitUntil(
+        (async () => {
+          try {
+            let messageData;
+            
+            switch (subcommand) {
+              case 'setup':
+                const result = await handleWumtodoSetup(interaction, locals.runtime.env);
+                messageData = (result as any).data || result;
+                break;
+              default:
+                messageData = { content: '不明なサブコマンドです。' };
+            }
+            
+            // フォローアップメッセージを送信
+            await sendFollowUpMessage(interaction, messageData, locals.runtime.env);
+          } catch (error) {
+            console.error('Command handling error:', error);
+            await sendFollowUpMessage(
+              interaction,
+              { content: 'エラーが発生しました。もう一度お試しください。' },
+              locals.runtime.env
+            );
           }
-          
-          // フォローアップメッセージを送信
-          await sendFollowUpMessage(interaction, messageData, locals.runtime.env);
-        } catch (error) {
-          console.error('Command handling error:', error);
-          await sendFollowUpMessage(
-            interaction,
-            { content: 'エラーが発生しました。もう一度お試しください。' },
-            locals.runtime.env
-          );
-        }
-      }, 0);
+        })()
+      );
       
       return new Response(JSON.stringify(deferredResponse), {
         headers: { 'Content-Type': 'application/json' },
@@ -113,55 +116,58 @@ export const POST: APIRoute = async ({ request, locals }) => {
         type: 5, // InteractionResponseType.DeferredChannelMessageWithSource
       };
       
-      // Deferredレスポンスを送信後、非同期で処理を実行
-      setTimeout(async () => {
-        try {
-          let messageData;
-          
-          switch (subcommand) {
-            case 'create':
-              const createResult = await handleTaskCreate(interaction, locals.runtime.env);
-              messageData = createResult.data;
-              break;
-            case 'list':
-              const listResult = await handleTaskList(interaction, locals.runtime.env);
-              messageData = listResult.data;
-              break;
-            case 'status':
-              const statusResult = await handleTaskStatus(interaction, locals.runtime.env);
-              messageData = statusResult.data;
-              break;
-            case 'assign':
-              const assignResult = await handleTaskAssign(interaction, locals.runtime.env);
-              messageData = assignResult.data;
-              break;
-            case 'due':
-              const dueResult = await handleTaskDue(interaction, locals.runtime.env);
-              messageData = dueResult.data;
-              break;
-            case 'close':
-              const closeResult = await handleTaskClose(interaction, locals.runtime.env);
-              messageData = closeResult.data;
-              break;
-            case 'comment':
-              const commentResult = await handleTaskComment(interaction, locals.runtime.env);
-              messageData = commentResult.data;
-              break;
-            default:
-              messageData = { content: '不明なサブコマンドです。' };
+      // Cloudflare WorkersのwaitUntilを使用して非同期処理を実行
+      const ctx = locals.runtime.ctx;
+      ctx.waitUntil(
+        (async () => {
+          try {
+            let messageData;
+            
+            switch (subcommand) {
+              case 'create':
+                const createResult = await handleTaskCreate(interaction, locals.runtime.env);
+                messageData = (createResult as any).data || createResult;
+                break;
+              case 'list':
+                const listResult = await handleTaskList(interaction, locals.runtime.env);
+                messageData = (listResult as any).data || listResult;
+                break;
+              case 'status':
+                const statusResult = await handleTaskStatus(interaction, locals.runtime.env);
+                messageData = (statusResult as any).data || statusResult;
+                break;
+              case 'assign':
+                const assignResult = await handleTaskAssign(interaction, locals.runtime.env);
+                messageData = (assignResult as any).data || assignResult;
+                break;
+              case 'due':
+                const dueResult = await handleTaskDue(interaction, locals.runtime.env);
+                messageData = (dueResult as any).data || dueResult;
+                break;
+              case 'close':
+                const closeResult = await handleTaskClose(interaction, locals.runtime.env);
+                messageData = (closeResult as any).data || closeResult;
+                break;
+              case 'comment':
+                const commentResult = await handleTaskComment(interaction, locals.runtime.env);
+                messageData = (commentResult as any).data || commentResult;
+                break;
+              default:
+                messageData = { content: '不明なサブコマンドです。' };
+            }
+            
+            // フォローアップメッセージを送信
+            await sendFollowUpMessage(interaction, messageData, locals.runtime.env);
+          } catch (error) {
+            console.error('Command handling error:', error);
+            await sendFollowUpMessage(
+              interaction,
+              { content: 'エラーが発生しました。もう一度お試しください。' },
+              locals.runtime.env
+            );
           }
-          
-          // フォローアップメッセージを送信
-          await sendFollowUpMessage(interaction, messageData, locals.runtime.env);
-        } catch (error) {
-          console.error('Command handling error:', error);
-          await sendFollowUpMessage(
-            interaction,
-            { content: 'エラーが発生しました。もう一度お試しください。' },
-            locals.runtime.env
-          );
-        }
-      }, 0);
+        })()
+      );
       
       return new Response(JSON.stringify(deferredResponse), {
         headers: { 'Content-Type': 'application/json' },

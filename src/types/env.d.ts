@@ -21,6 +21,7 @@ declare namespace App {
         BETTER_AUTH_SECRET: string;
         PUBLIC_SITE_URL: string;
       };
+      ctx: ExecutionContext;
     };
     user?: {
       id: string;
