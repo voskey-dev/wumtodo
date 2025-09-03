@@ -54,13 +54,46 @@
   let totalPages = $state(1);
   const itemsPerPage = 25;
 
-  // URLクエリパラメータからページ番号を初期化
+  // URLクエリパラメータからページ番号と各種フィルターを初期化
   onMount(() => {
     if (typeof window !== 'undefined') {
       const urlParams = new URLSearchParams(window.location.search);
+      
+      // ページ番号
       const urlPage = parseInt(urlParams.get('page') || '1', 10);
       if (urlPage > 0 && urlPage !== currentPage) {
         currentPage = urlPage;
+      }
+      
+      // フィルター設定
+      const urlStatus = urlParams.get('status');
+      if (urlStatus && ['todo', 'in_progress', 'completed'].includes(urlStatus)) {
+        statusFilter = urlStatus;
+      }
+      
+      const urlPriority = urlParams.get('priority');
+      if (urlPriority && ['high', 'medium', 'low'].includes(urlPriority)) {
+        priorityFilter = urlPriority;
+      }
+      
+      const urlAssignee = urlParams.get('assignee');
+      if (urlAssignee && ['me', 'unassigned'].includes(urlAssignee)) {
+        assigneeFilter = urlAssignee;
+      }
+      
+      const urlSort = urlParams.get('sort');
+      if (urlSort && ['created_at', 'due_date', 'priority', 'status'].includes(urlSort)) {
+        sortBy = urlSort;
+      }
+      
+      const urlOrder = urlParams.get('order');
+      if (urlOrder && ['asc', 'desc'].includes(urlOrder)) {
+        sortOrder = urlOrder as 'asc' | 'desc';
+      }
+      
+      const urlSearch = urlParams.get('search');
+      if (urlSearch) {
+        searchQuery = urlSearch;
       }
     }
   });
@@ -90,6 +123,8 @@
     if (filtersChanged) {
       currentPage = 1;
       previousFilters = { ...currentFilters };
+      // フィルター変更時にURLも更新
+      updateURL();
     }
   });
 
@@ -160,14 +195,56 @@
     }
   }
 
-  function updateURL(page: number) {
+  function updateURL(page?: number) {
     if (typeof window !== 'undefined') {
       const url = new URL(window.location.href);
-      if (page === 1) {
-        url.searchParams.delete('page');
-      } else {
-        url.searchParams.set('page', page.toString());
+      
+      // ページ番号の更新
+      if (page !== undefined) {
+        if (page === 1) {
+          url.searchParams.delete('page');
+        } else {
+          url.searchParams.set('page', page.toString());
+        }
       }
+      
+      // フィルター設定の更新
+      if (statusFilter === 'all') {
+        url.searchParams.delete('status');
+      } else {
+        url.searchParams.set('status', statusFilter);
+      }
+      
+      if (priorityFilter === 'all') {
+        url.searchParams.delete('priority');
+      } else {
+        url.searchParams.set('priority', priorityFilter);
+      }
+      
+      if (assigneeFilter === 'all') {
+        url.searchParams.delete('assignee');
+      } else {
+        url.searchParams.set('assignee', assigneeFilter);
+      }
+      
+      if (sortBy === 'created_at') {
+        url.searchParams.delete('sort');
+      } else {
+        url.searchParams.set('sort', sortBy);
+      }
+      
+      if (sortOrder === 'desc') {
+        url.searchParams.delete('order');
+      } else {
+        url.searchParams.set('order', sortOrder);
+      }
+      
+      if (searchQuery === '') {
+        url.searchParams.delete('search');
+      } else {
+        url.searchParams.set('search', searchQuery);
+      }
+      
       window.history.replaceState({}, '', url.pathname + url.search);
     }
   }
@@ -202,11 +279,21 @@
   function getPageURL(page: number): string {
     if (typeof window === 'undefined') return '#';
     const url = new URL(window.location.href);
+    
+    // 現在のフィルター設定を維持しながらページだけ変更
+    if (statusFilter !== 'all') url.searchParams.set('status', statusFilter);
+    if (priorityFilter !== 'all') url.searchParams.set('priority', priorityFilter);
+    if (assigneeFilter !== 'all') url.searchParams.set('assignee', assigneeFilter);
+    if (sortBy !== 'created_at') url.searchParams.set('sort', sortBy);
+    if (sortOrder !== 'desc') url.searchParams.set('order', sortOrder);
+    if (searchQuery !== '') url.searchParams.set('search', searchQuery);
+    
     if (page === 1) {
       url.searchParams.delete('page');
     } else {
       url.searchParams.set('page', page.toString());
     }
+    
     return url.pathname + url.search;
   }
 </script>

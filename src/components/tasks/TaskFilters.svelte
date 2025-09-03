@@ -33,6 +33,13 @@
     sortBy = 'created_at';
     sortOrder = 'desc';
     searchQuery = '';
+    
+    // URLクエリパラメータもクリア
+    if (typeof window !== 'undefined') {
+      const url = new URL(window.location.href);
+      url.search = '';
+      window.history.replaceState({}, '', url.pathname);
+    }
   }
 </script>
 
