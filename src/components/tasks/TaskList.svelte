@@ -54,6 +54,17 @@
   let totalPages = $state(1);
   const itemsPerPage = 25;
 
+  // URLクエリパラメータからページ番号を初期化
+  onMount(() => {
+    if (typeof window !== 'undefined') {
+      const urlParams = new URLSearchParams(window.location.search);
+      const urlPage = parseInt(urlParams.get('page') || '1', 10);
+      if (urlPage > 0 && urlPage !== currentPage) {
+        currentPage = urlPage;
+      }
+    }
+  });
+
   // フィルター変更時のページリセット用の状態
   let previousFilters = $state({
     status: statusFilter,
@@ -145,6 +156,19 @@
   function handlePageChange(page: number) {
     if (page >= 1 && page <= totalPages) {
       currentPage = page;
+      updateURL(page);
+    }
+  }
+
+  function updateURL(page: number) {
+    if (typeof window !== 'undefined') {
+      const url = new URL(window.location.href);
+      if (page === 1) {
+        url.searchParams.delete('page');
+      } else {
+        url.searchParams.set('page', page.toString());
+      }
+      window.history.replaceState({}, '', url.pathname + url.search);
     }
   }
 
@@ -173,6 +197,17 @@
     }
     
     return pages;
+  }
+
+  function getPageURL(page: number): string {
+    if (typeof window === 'undefined') return '#';
+    const url = new URL(window.location.href);
+    if (page === 1) {
+      url.searchParams.delete('page');
+    } else {
+      url.searchParams.set('page', page.toString());
+    }
+    return url.pathname + url.search;
   }
 </script>
 
@@ -247,7 +282,7 @@
       <PaginationContent>
         <PaginationItem>
           <PaginationPrevious
-            href="#"
+            href={currentPage > 1 ? getPageURL(currentPage - 1) : '#'}
             on:click={(e) => {
               e.preventDefault();
               handlePageChange(currentPage - 1);
@@ -259,7 +294,7 @@
         {#each getVisiblePages() as pageNumber}
           <PaginationItem>
             <PaginationLink
-              href="#"
+              href={getPageURL(pageNumber)}
               on:click={(e) => {
                 e.preventDefault();
                 handlePageChange(pageNumber);
@@ -273,7 +308,7 @@
         
         <PaginationItem>
           <PaginationNext
-            href="#"
+            href={currentPage < totalPages ? getPageURL(currentPage + 1) : '#'}
             on:click={(e) => {
               e.preventDefault();
               handlePageChange(currentPage + 1);
