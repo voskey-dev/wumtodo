@@ -38,105 +38,135 @@
 
 <Card>
   <CardContent class="p-4 space-y-4">
-    <div class="w-full">
+    <!-- 検索バー -->
+    <div class="w-full space-y-2">
+      <label for="search" class="text-sm font-medium text-gray-700">タスクを検索</label>
       <Input
+        id="search"
         type="text"
         placeholder="タスク名で検索..."
         bind:value={searchQuery}
         class="w-full"
       />
     </div>
-    <div class="flex flex-wrap gap-4 items-center">
-      <div class="flex-1 min-w-[150px]">
-        <Select
-          value={statusFilter}
-          onValueChange={(v) => v && (statusFilter = v)}
-        >
-          <SelectTrigger>
-            <span>
-              {statusFilter === 'all' ? 'すべて' : statusFilter === 'todo' ? '未着手' : statusFilter === 'in_progress' ? '進行中' : statusFilter === 'completed' ? '完了' : 'ステータス'}
-            </span>
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="all">すべて</SelectItem>
-            <SelectItem value="todo">未着手</SelectItem>
-            <SelectItem value="in_progress">進行中</SelectItem>
-            <SelectItem value="completed">完了</SelectItem>
-          </SelectContent>
-        </Select>
+    
+    <!-- フィルターセクション -->
+    <div class="space-y-4">
+      <h3 class="text-sm font-semibold text-gray-900 border-b pb-2">絞り込み条件</h3>
+      
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+        <!-- ステータスフィルター -->
+        <div class="space-y-2">
+          <label class="text-sm font-medium text-gray-700">ステータス</label>
+          <p class="text-xs text-gray-500">タスクの進行状況で絞り込み</p>
+          <Select
+            value={statusFilter}
+            onValueChange={(v) => v && (statusFilter = v)}
+          >
+            <SelectTrigger class="w-full">
+              <span>
+                {statusFilter === 'all' ? 'すべて' : statusFilter === 'todo' ? '未着手' : statusFilter === 'in_progress' ? '進行中' : statusFilter === 'completed' ? '完了' : 'ステータス'}
+              </span>
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">すべて</SelectItem>
+              <SelectItem value="todo">未着手</SelectItem>
+              <SelectItem value="in_progress">進行中</SelectItem>
+              <SelectItem value="completed">完了</SelectItem>
+            </SelectContent>
+          </Select>
+        </div>
+
+        <!-- 優先度フィルター -->
+        <div class="space-y-2">
+          <label class="text-sm font-medium text-gray-700">優先度</label>
+          <p class="text-xs text-gray-500">タスクの重要度で絞り込み</p>
+          <Select
+            value={priorityFilter}
+            onValueChange={(v) => v && (priorityFilter = v)}
+          >
+            <SelectTrigger class="w-full">
+              <span>
+                {priorityFilter === 'all' ? 'すべて' : priorityFilter === 'high' ? '高' : priorityFilter === 'medium' ? '中' : priorityFilter === 'low' ? '低' : '優先度'}
+              </span>
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">すべて</SelectItem>
+              <SelectItem value="high">高</SelectItem>
+              <SelectItem value="medium">中</SelectItem>
+              <SelectItem value="low">低</SelectItem>
+            </SelectContent>
+          </Select>
+        </div>
+
+        <!-- 担当者フィルター -->
+        <div class="space-y-2">
+          <label class="text-sm font-medium text-gray-700">担当者</label>
+          <p class="text-xs text-gray-500">割り当て状況で絞り込み</p>
+          <Select
+            value={assigneeFilter}
+            onValueChange={(v) => v && (assigneeFilter = v)}
+          >
+            <SelectTrigger class="w-full">
+              <span>
+                {assigneeFilter === 'all' ? 'すべて' : assigneeFilter === 'me' ? '自分' : assigneeFilter === 'unassigned' ? '未割当' : '担当者'}
+              </span>
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">すべて</SelectItem>
+              <SelectItem value="me">自分</SelectItem>
+              <SelectItem value="unassigned">未割当</SelectItem>
+            </SelectContent>
+          </Select>
+        </div>
+
+        <!-- 並び順フィルター -->
+        <div class="space-y-2">
+          <label class="text-sm font-medium text-gray-700">並び順</label>
+          <p class="text-xs text-gray-500">表示順序を指定</p>
+          <Select
+            value={sortBy}
+            onValueChange={(v) => v && (sortBy = v)}
+          >
+            <SelectTrigger class="w-full">
+              <span>
+                {sortBy === 'created_at' ? '作成日' : sortBy === 'due_date' ? '期限' : sortBy === 'priority' ? '優先度' : sortBy === 'status' ? 'ステータス' : '並び順'}
+              </span>
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="created_at">作成日</SelectItem>
+              <SelectItem value="due_date">期限</SelectItem>
+              <SelectItem value="priority">優先度</SelectItem>
+              <SelectItem value="status">ステータス</SelectItem>
+            </SelectContent>
+          </Select>
+        </div>
       </div>
-
-      <div class="flex-1 min-w-[150px]">
-        <Select
-          value={priorityFilter}
-          onValueChange={(v) => v && (priorityFilter = v)}
+      
+      <!-- アクションボタン -->
+      <div class="flex flex-wrap gap-2 pt-2 border-t">
+        <Button
+          variant="outline"
+          size="sm"
+          onclick={() => sortOrder = sortOrder === 'asc' ? 'desc' : 'asc'}
+          class="flex items-center gap-1"
+          title="表示順序を切り替えます"
         >
-          <SelectTrigger>
-            <span>
-              {priorityFilter === 'all' ? 'すべて' : priorityFilter === 'high' ? '高' : priorityFilter === 'medium' ? '中' : priorityFilter === 'low' ? '低' : '優先度'}
-            </span>
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="all">すべて</SelectItem>
-            <SelectItem value="high">高</SelectItem>
-            <SelectItem value="medium">中</SelectItem>
-            <SelectItem value="low">低</SelectItem>
-          </SelectContent>
-        </Select>
-      </div>
+          <span class="text-xs">📈</span>
+          {sortOrder === 'asc' ? '昇順' : '降順'}
+        </Button>
 
-      <div class="flex-1 min-w-[150px]">
-        <Select
-          value={assigneeFilter}
-          onValueChange={(v) => v && (assigneeFilter = v)}
+        <Button
+          variant="ghost"
+          size="sm"
+          onclick={resetFilters}
+          class="flex items-center gap-1"
+          title="すべての絞り込み条件をリセットします"
         >
-          <SelectTrigger>
-            <span>
-              {assigneeFilter === 'all' ? 'すべて' : assigneeFilter === 'me' ? '自分' : assigneeFilter === 'unassigned' ? '未割当' : '担当者'}
-            </span>
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="all">すべて</SelectItem>
-            <SelectItem value="me">自分</SelectItem>
-            <SelectItem value="unassigned">未割当</SelectItem>
-          </SelectContent>
-        </Select>
+          <span class="text-xs">🔄</span>
+          リセット
+        </Button>
       </div>
-
-      <div class="flex-1 min-w-[150px]">
-        <Select
-          value={sortBy}
-          onValueChange={(v) => v && (sortBy = v)}
-        >
-          <SelectTrigger>
-            <span>
-              {sortBy === 'created_at' ? '作成日' : sortBy === 'due_date' ? '期限' : sortBy === 'priority' ? '優先度' : '並び順'}
-            </span>
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="created_at">作成日</SelectItem>
-            <SelectItem value="due_date">期限</SelectItem>
-            <SelectItem value="priority">優先度</SelectItem>
-            <SelectItem value="status">ステータス</SelectItem>
-          </SelectContent>
-        </Select>
-      </div>
-
-      <Button
-        variant="outline"
-        size="sm"
-        onclick={() => sortOrder = sortOrder === 'asc' ? 'desc' : 'asc'}
-      >
-        {sortOrder === 'asc' ? '昇順' : '降順'}
-      </Button>
-
-      <Button
-        variant="ghost"
-        size="sm"
-        onclick={resetFilters}
-      >
-        リセット
-      </Button>
     </div>
   </CardContent>
 </Card>
