@@ -96,7 +96,7 @@ export async function handleTaskList(
    ${priority} 優先度 | 担当: ${assignee} | 期限: ${dueDate}`;
     }).join('\n\n');
 
-    const response = `📋 **タスク一覧**\n\n${taskList}\n\n🔗 **すべてのタスクを確認**: ${env.PUBLIC_SITE_URL || 'https://wumtodo.pages.dev'}/tasks`;
+    const response = `📋 **タスク一覧**\n\n${taskList}\n\n🔗 **すべてのタスクを確認**: <${env.PUBLIC_SITE_URL || 'https://wumtodo.pages.dev'}/tasks>`;
 
     return {
       type: InteractionResponseType.ChannelMessageWithSource,

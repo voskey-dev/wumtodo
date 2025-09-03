@@ -85,6 +85,6 @@ export function formatMentionNotification(
     `📌 **タスク**: ${taskTitle}`,
     `💬 **コンテキスト**: ${mentionContext}`,
     ``,
-    `🔗 **詳細を確認**: ${siteUrl || 'https://wumtodo.pages.dev'}/tasks/${taskId}`
+    `🔗 **詳細を確認**: <${siteUrl || 'https://wumtodo.pages.dev'}/tasks/${taskId}>`
   ].join('\n');
 }

@@ -50,7 +50,7 @@ export async function handleWumtodoSetup(
       return {
         type: InteractionResponseType.ChannelMessageWithSource,
         data: {
-          content: `✅ このサーバーは既にwumtodoに登録されています！\n\nチーム名: **${existingTeam.name}**\n\n以下のコマンドが使用可能です：\n• \`/task create\` - 新しいタスクを作成\n• \`/task list\` - タスク一覧を表示\n• \`/task status\` - タスクのステータスを変更\n• \`/task assign\` - タスクの担当者を変更\n• \`/task due\` - タスクの期限を設定\n• \`/task close\` - タスクを完了\n• \`/task comment\` - タスクにコメントを追加\n\nWebインターフェース: https://wumtodo.example.com`,
+          content: `✅ このサーバーは既にwumtodoに登録されています！\n\nチーム名: **${existingTeam.name}**\n\n以下のコマンドが使用可能です：\n• \`/task create\` - 新しいタスクを作成\n• \`/task list\` - タスク一覧を表示\n• \`/task status\` - タスクのステータスを変更\n• \`/task assign\` - タスクの担当者を変更\n• \`/task due\` - タスクの期限を設定\n• \`/task close\` - タスクを完了\n• \`/task comment\` - タスクにコメントを追加\n\nWebインターフェース: <https://wumtodo.example.com>`,
           flags: 64 // Ephemeral
         },
       };
@@ -130,7 +130,7 @@ export async function handleWumtodoSetup(
       `• \`/task comment\` - タスクにコメントを追加`,
       ``,
       `**🌐 Webインターフェース:**`,
-      `${env.PUBLIC_SITE_URL || 'https://wumtodo.example.com'}`,
+      `<${env.PUBLIC_SITE_URL || 'https://wumtodo.example.com'}>`,
       ``,
       `**👥 メンバーの追加:**`,
       `1. メンバーにDiscordでwumtodoにログインしてもらう`,

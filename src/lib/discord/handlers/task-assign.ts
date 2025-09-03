@@ -117,7 +117,7 @@ export async function handleTaskAssign(
       `👤 **変更者**: <@${interaction.member.user.id}>`,
       `🔄 **変更**: ${task.old_assignee_discord_id ? `<@${task.old_assignee_discord_id}>` : '未割当'} → <@${userId}>`,
       ``,
-      `🔗 **詳細を確認**: ${env.PUBLIC_SITE_URL || 'https://wumtodo.pages.dev'}/tasks/${taskId}`
+      `🔗 **詳細を確認**: <${env.PUBLIC_SITE_URL || 'https://wumtodo.pages.dev'}/tasks/${taskId}>`
     ].join('\n');
 
     // Discord APIクライアントを初期化
@@ -150,7 +150,7 @@ export async function handleTaskAssign(
         ``,
         `このタスクはあなたに割り当てられました。`,
         ``,
-        `🔗 **詳細を確認**: ${env.PUBLIC_SITE_URL || 'https://wumtodo.pages.dev'}/tasks/${taskId}`
+        `🔗 **詳細を確認**: <${env.PUBLIC_SITE_URL || 'https://wumtodo.pages.dev'}/tasks/${taskId}>`
       ].join('\n');
       
       await discordAPI.sendDirectMessage(userId, dmMessage);
@@ -161,7 +161,7 @@ export async function handleTaskAssign(
     return {
       type: InteractionResponseType.ChannelMessageWithSource,
       data: { 
-        content: `👤 タスク「**${task.title}**」の担当者を <@${userId}> に変更しました。\n\n🔗 **詳細を確認**: ${env.PUBLIC_SITE_URL || 'https://wumtodo.pages.dev'}/tasks/${taskId}`
+        content: `👤 タスク「**${task.title}**」の担当者を <@${userId}> に変更しました。\n\n🔗 **詳細を確認**: <${env.PUBLIC_SITE_URL || 'https://wumtodo.pages.dev'}/tasks/${taskId}>`
       },
     };
   } catch (error) {

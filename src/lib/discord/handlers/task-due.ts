@@ -118,7 +118,7 @@ export async function handleTaskDue(
       ``,
       dueText,
       ``,
-      `🔗 **詳細を確認**: ${env.PUBLIC_SITE_URL || 'https://wumtodo.pages.dev'}/tasks/${taskId}`
+      `🔗 **詳細を確認**: <${env.PUBLIC_SITE_URL || 'https://wumtodo.pages.dev'}/tasks/${taskId}>`
     ].filter(Boolean).join('\n');
 
     // Discord APIクライアントを初期化
@@ -152,7 +152,7 @@ export async function handleTaskDue(
           ``,
           dueText,
           ``,
-          `🔗 **詳細を確認**: ${env.PUBLIC_SITE_URL || 'https://wumtodo.pages.dev'}/tasks/${taskId}`
+          `🔗 **詳細を確認**: <${env.PUBLIC_SITE_URL || 'https://wumtodo.pages.dev'}/tasks/${taskId}>`
         ].join('\n');
         
         await discordAPI.sendDirectMessage(task.assignee_discord_id, dmMessage);
@@ -164,7 +164,7 @@ export async function handleTaskDue(
     return {
       type: InteractionResponseType.ChannelMessageWithSource,
       data: { 
-        content: `📅 タスク「**${task.title}**」の期限を **${dateStr}** に設定しました。 ${dueText}\n\n🔗 **詳細を確認**: ${env.PUBLIC_SITE_URL || 'https://wumtodo.pages.dev'}/tasks/${taskId}`
+        content: `📅 タスク「**${task.title}**」の期限を **${dateStr}** に設定しました。 ${dueText}\n\n🔗 **詳細を確認**: <${env.PUBLIC_SITE_URL || 'https://wumtodo.pages.dev'}/tasks/${taskId}>`
       },
     };
   } catch (error) {

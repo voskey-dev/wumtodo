@@ -156,7 +156,7 @@ export async function handleTaskCreate(
         const { DiscordAPI } = await import('../api');
         const api = new DiscordAPI(env.DISCORD_BOT_TOKEN);
         
-        const threadMessage = `📋 **タスク: ${title}**\n\n${description || '説明なし'}\n\n**優先度**: ${priority === 'high' ? '高' : priority === 'low' ? '低' : '中'}\n**担当者**: ${assigneeId ? `<@${assigneeId}>` : '未割当'}\n**作成者**: <@${userId}>\n\n🔗 **詳細を確認**: ${env.PUBLIC_SITE_URL || 'https://wumtodo.pages.dev'}/tasks/${taskId}`;
+        const threadMessage = `📋 **タスク: ${title}**\n\n${description || '説明なし'}\n\n**優先度**: ${priority === 'high' ? '高' : priority === 'low' ? '低' : '中'}\n**担当者**: ${assigneeId ? `<@${assigneeId}>` : '未割当'}\n**作成者**: <@${userId}>\n\n🔗 **詳細を確認**: <${env.PUBLIC_SITE_URL || 'https://wumtodo.pages.dev'}/tasks/${taskId}>`;
         
         const thread = await api.createThread(
           interaction.channel.id,
@@ -196,7 +196,7 @@ ${description ? `**説明**: ${description}` : ''}
 ${assigneeId ? `**担当者**: <@${assigneeId}>` : ''}
 **優先度**: ${priority === 'high' ? '高' : priority === 'low' ? '低' : '中'}
 
-🔗 **詳細を確認**: ${env.PUBLIC_SITE_URL || 'https://wumtodo.pages.dev'}/tasks/${taskId}`;
+🔗 **詳細を確認**: <${env.PUBLIC_SITE_URL || 'https://wumtodo.pages.dev'}/tasks/${taskId}>`;
 
     return {
       type: InteractionResponseType.ChannelMessageWithSource,
