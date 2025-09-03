@@ -52,11 +52,34 @@
   let searchQuery = $state('');
   let currentPage = $state(1);
   let totalPages = $state(1);
-  const itemsPerPage = 10;
+  const itemsPerPage = 25;
 
-  $effect.pre(() => {
-    // Reset page when filters change
-    currentPage = 1;
+  // フィルター変更時のページリセット用の状態
+  let previousFilters = $state({
+    status: statusFilter,
+    priority: priorityFilter,
+    assignee: assigneeFilter,
+    sort: sortBy,
+    order: sortOrder,
+    search: searchQuery
+  });
+
+  $effect(() => {
+    // フィルターが変更された場合のみページをリセット
+    const currentFilters = {
+      status: statusFilter,
+      priority: priorityFilter,
+      assignee: assigneeFilter,
+      sort: sortBy,
+      order: sortOrder,
+      search: searchQuery
+    };
+    
+    const filtersChanged = JSON.stringify(previousFilters) !== JSON.stringify(currentFilters);
+    if (filtersChanged) {
+      currentPage = 1;
+      previousFilters = { ...currentFilters };
+    }
   });
 
   // Fetch tasks when dependencies change
@@ -124,6 +147,33 @@
       currentPage = page;
     }
   }
+
+  function getVisiblePages(): number[] {
+    const pages: number[] = [];
+    const maxVisible = 5;
+    
+    if (totalPages <= maxVisible) {
+      // 総ページ数が最大表示数以下の場合、全ページを表示
+      for (let i = 1; i <= totalPages; i++) {
+        pages.push(i);
+      }
+    } else {
+      // 総ページ数が多い場合、現在のページ周辺を表示
+      let startPage = Math.max(1, currentPage - Math.floor(maxVisible / 2));
+      let endPage = Math.min(totalPages, startPage + maxVisible - 1);
+      
+      // 開始ページが後ろにずれすぎた場合の調整
+      if (endPage - startPage + 1 < maxVisible) {
+        startPage = Math.max(1, endPage - maxVisible + 1);
+      }
+      
+      for (let i = startPage; i <= endPage; i++) {
+        pages.push(i);
+      }
+    }
+    
+    return pages;
+  }
 </script>
 
 <div class="space-y-6">
@@ -136,10 +186,10 @@
     bind:searchQuery
   />
 
-  <div class="grid gap-4">
+  <div class="space-y-2">
     {#if loading}
-      {#each Array(3) as _, i}
-        <div class="h-32 bg-muted animate-pulse rounded-lg"></div>
+      {#each Array(5) as _, i}
+        <div class="h-16 bg-muted animate-pulse rounded-lg"></div>
       {/each}
     {:else if tasks.length === 0}
       <Card>
@@ -154,39 +204,39 @@
         {@const statusBadge = getStatusBadge(task.status)}
         {@const priorityBadge = getPriorityBadge(task.priority)}
         <a href={`/tasks/${task.id}`} class="block transition-colors hover:no-underline">
-          <Card className="hover:bg-accent hover:text-accent-foreground cursor-pointer">
-            <CardHeader>
-              <div class="flex items-start justify-between">
-                <div class="space-y-1">
-                  <CardTitle class="hover:underline">
-                    {task.title}
-                  </CardTitle>
-                  {#if task.description}
-                    <CardDescription>{task.description}</CardDescription>
-                  {/if}
-                </div>
-                <div class="flex gap-2">
-                  <Badge className={statusBadge.className}>{statusBadge.label}</Badge>
-                  <Badge className={priorityBadge.className}>{priorityBadge.label}</Badge>
+          <div class="flex items-start gap-3 p-3 rounded-lg border bg-card text-card-foreground hover:bg-accent hover:text-accent-foreground cursor-pointer">
+            <div class="flex-1 min-w-0">
+              <div class="flex items-start justify-between gap-2 mb-1">
+                <h3 class="font-medium leading-tight hover:underline line-clamp-2 sm:line-clamp-1">
+                  {task.title}
+                </h3>
+                <div class="flex gap-1 flex-shrink-0">
+                  <Badge className="{statusBadge.className} text-xs py-0.5 px-1.5">{statusBadge.label}</Badge>
+                  <Badge className="{priorityBadge.className} text-xs py-0.5 px-1.5">{priorityBadge.label}</Badge>
                 </div>
               </div>
-            </CardHeader>
-            <CardContent>
-              <div class="flex items-center justify-between text-sm text-muted-foreground">
-                <div class="flex items-center gap-4">
-                  <UserAvatar user={task.assignee} size="sm" />
-                  {#if task.due_date}
-                    <span>
-                      期限: {format(new Date(task.due_date), 'yyyy/MM/dd', { locale: ja })}
-                    </span>
-                  {/if}
-                </div>
+              {#if task.description}
+                <p class="text-sm text-muted-foreground line-clamp-1 mb-2 sm:mb-1">{task.description}</p>
+              {/if}
+              <div class="flex items-center gap-2 text-xs text-muted-foreground sm:hidden">
+                <UserAvatar user={task.assignee} size="sm" showName={false} />
+                {#if task.due_date}
+                  <span>期限: {format(new Date(task.due_date), 'MM/dd', { locale: ja })}</span>
+                {/if}
+              </div>
+            </div>
+            <div class="hidden sm:flex items-center gap-3 flex-shrink-0 text-xs text-muted-foreground">
+              <UserAvatar user={task.assignee} size="sm" showName={false} />
+              {#if task.due_date}
                 <span>
-                  作成: {format(new Date(task.created_at), 'yyyy/MM/dd HH:mm', { locale: ja })}
+                  {format(new Date(task.due_date), 'MM/dd', { locale: ja })}
                 </span>
-              </div>
-            </CardContent>
-          </Card>
+              {/if}
+              <span class="hidden md:inline">
+                {format(new Date(task.created_at), 'MM/dd HH:mm', { locale: ja })}
+              </span>
+            </div>
+          </div>
         </a>
       {/each}
     {/if}
@@ -206,8 +256,7 @@
           />
         </PaginationItem>
         
-        {#each Array(Math.min(5, totalPages)) as _, i}
-          {@const pageNumber = i + 1}
+        {#each getVisiblePages() as pageNumber}
           <PaginationItem>
             <PaginationLink
               href="#"
