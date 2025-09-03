@@ -58,7 +58,6 @@
         <!-- ステータスフィルター -->
         <div class="space-y-2">
           <label class="text-sm font-medium text-gray-700">ステータス</label>
-          <p class="text-xs text-gray-500">タスクの進行状況で絞り込み</p>
           <Select
             value={statusFilter}
             onValueChange={(v) => v && (statusFilter = v)}
@@ -80,7 +79,6 @@
         <!-- 優先度フィルター -->
         <div class="space-y-2">
           <label class="text-sm font-medium text-gray-700">優先度</label>
-          <p class="text-xs text-gray-500">タスクの重要度で絞り込み</p>
           <Select
             value={priorityFilter}
             onValueChange={(v) => v && (priorityFilter = v)}
@@ -102,7 +100,6 @@
         <!-- 担当者フィルター -->
         <div class="space-y-2">
           <label class="text-sm font-medium text-gray-700">担当者</label>
-          <p class="text-xs text-gray-500">割り当て状況で絞り込み</p>
           <Select
             value={assigneeFilter}
             onValueChange={(v) => v && (assigneeFilter = v)}
@@ -123,7 +120,6 @@
         <!-- 並び順フィルター -->
         <div class="space-y-2">
           <label class="text-sm font-medium text-gray-700">並び順</label>
-          <p class="text-xs text-gray-500">表示順序を指定</p>
           <Select
             value={sortBy}
             onValueChange={(v) => v && (sortBy = v)}
